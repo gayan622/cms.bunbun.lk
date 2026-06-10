@@ -1,0 +1,30 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Illuminate\Http\Request;
+use Closure;
+use Symfony\Component\HttpFoundation\Response;
+
+class RoleMiddleware
+{
+
+public function handle(Request $request, Closure $next, ...$roles): Response
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthenticated'
+            ], 401);
+        }
+
+        if (!in_array($user->role, $roles)) {
+            return response()->json([
+                'message' => 'Unauthorized role access'
+            ], 403);
+        }
+
+        return $next($request);
+    }
+}

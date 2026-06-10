@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@theme {
+  /* Define custom variables here */
+  --color-primary: #E50914;
+  --color-background: #FAF6EE;
+
+  /* Example: defining a custom spacing scale */
+  --spacing-container: 1200px;
+}
