@@ -171,6 +171,8 @@
 <script>
 function posSystem() {
     return {
+        customer_name: '',
+        phone: '',
         search: '',
         activeCategory: 'all',
         menu: @json($menuItems),
@@ -179,7 +181,8 @@ function posSystem() {
         orderType: 'dine_in',
         paymentMethod: 'cash',
         paidAmount: 0,
-        isProcessing: false, // Added to prevent double-click orders
+        orderNumber: null,
+        isProcessing: false,
 
         // Robust calculation: Ensure values are treated as numbers
         get total() {
@@ -190,12 +193,14 @@ function posSystem() {
             return Number(this.paidAmount) - this.total;
         },
 
-        buildReceipt() {
+   buildReceipt() {
+
+    let displayOrder = this.orderNumber ? this.orderNumber : 'PENDING';
 
     let html = `
         <center>
             <h2>BunBun Kitchen</h2>
-            <p style="font-size: 24px; font-weight: bold;">Order # ${this.orderNumber}</p>
+            <p style="font-size: 24px; font-weight: bold;">Order # ${displayOrder}</p>
             <small>${new Date().toLocaleString()}</small>
         </center>
         <hr>
@@ -317,14 +322,18 @@ printReceipt() {
                         total: this.total,
                         type: this.orderType,
                         payment_method: this.paymentMethod,
-                        paid: this.paidAmount
+                        customer_name: this.customer_name,
+                        phone: this.phone,
+                        paid: this.paidAmount,
+                        payment_status: (Number(this.paidAmount) >= this.total) ? 'paid' : 'pending',
                     })
                 });
 
                 const data = await response.json();
-
+console.log('data:', data);
                 if (response.ok) {
                     this.orderNumber = data.order_number;
+
                      this.buildReceipt();
 
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -335,6 +344,8 @@ printReceipt() {
     window.onafterprint = () => {
         this.resetSystem();
     };
+
+    this.resetSystem();
                 } else {
                     alert('Error: ' + (data.message || 'Unknown server error'));
             console.error('Server Error:', data);
@@ -342,7 +353,10 @@ printReceipt() {
             } catch (error) {
                 //console.error(error);
                 console.error('Fetch Error:', error);
-                alert('Connection error. Check your server logs.');
+                if (error.response) {
+                    console.error('Server Data:', await error.data || 'No response data');
+                }
+               alert('Failed to place order. Check the browser console (F12) for the exact error.');
             } finally {
                 this.isProcessing = false;
             }

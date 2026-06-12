@@ -15,6 +15,7 @@ class Order extends Model
         'discount',
         'delivery_fee',
         'total',
+        'paid',
         'order_type',
         'payment_method',
         'payment_status',

@@ -22,12 +22,13 @@ return new class extends Migration
             $table->decimal('subtotal', 10, 2);
             $table->decimal('discount', 10, 2)->default(0);
             $table->decimal('total', 10, 2);
+            $table->decimal('paid', 10, 2)->default(0);
             $table->string('coupon_code')->nullable();
             $table->enum('status', [
             'pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 'delivered', 'cancelled'
         ])->default('pending');
             $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');
-            $table->enum('payment_method', ['cod', 'online'])->default('cod');
+            $table->enum('payment_method', ['cod', 'online', 'cash'])->default('cod');
                 $table->enum('order_type', [
                     'delivery',
                     'takeaway',
@@ -36,8 +37,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
- 
-   
+
+
     }
     /**
      * Reverse the migrations.
